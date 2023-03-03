@@ -1,0 +1,827 @@
+{
+	"env_map": {
+		"EXAMPLE_URL": "http://example.abc",
+		"EXAMPLE_PASS": "stoopidPass"
+	},
+	"import_map": [
+		{
+			"name": "matplotlib.pyplot",
+			"main": true,
+			"alias": "plt"
+		},
+		{
+			"name": "tempfile",
+			"main": true,
+			"members": [
+				"NamedTemporaryFile",
+				"TemporaryDirectory"
+			]
+		},
+		{
+			"name": "shutil",
+			"main": true
+		},
+		{
+			"name": "io",
+			"main": true
+		},
+		{
+			"name": "os",
+			"methods": true
+		},
+		{
+			"name": "typing",
+			"utils": true,
+			"models": true,
+			"members": [
+				"List"
+			]
+		},
+		{
+			"name": "io",
+			"utils": true,
+			"members": [
+				"TextIOWrapper"
+			]
+		}
+	],
+	"func_map": [
+		{
+			"name": "build_pie_chart",
+			"main": true,
+			"params": [
+				{
+					"name": "data",
+					"type": "dict"
+				}
+			],
+			"body": [
+				"labels = data.keys()",
+				"sizes = data.values()",
+				"fig, ax = plt.subplots()",
+				"ax.pie(sizes, labels=labels, autopct='%1.1f%%')",
+				"ax.axis('equal')",
+				"",
+				"# Save the figure to a buffer",
+				"buffer = io.BytesIO()",
+				"return buffer"
+			]
+		},
+		{
+			"name": "major_chords",
+			"method": true,
+			"params": [
+				{
+					"name": "intention",
+					"type": "str"
+				}
+			],
+			"body": [
+				"try:",
+				"  chords = ut.generate_chords(md.major, intention)",
+				"except ValueError as e:",
+				"  return e",
+				"return chords"
+			]
+		},
+		{
+			"name": "minor_chords",
+			"method": true,
+			"params": [
+				{
+					"name": "intention",
+					"type": "str"
+				}
+			],
+			"body": [
+				"try:",
+				"  chords = ut.generate_chords(md.minor, intention)",
+				"except ValueError as e:",
+				"  return e",
+				"return chords"
+			]
+		},
+		{
+			"name": "mixo_chords",
+			"method": true,
+			"params": [
+				{
+					"name": "intention",
+					"type": "str"
+				}
+			],
+			"body": [
+				"try:",
+				"  chords = ut.generate_chords(md.mixolydian, intention)",
+				"except ValueError as e:",
+				"  return e",
+				"return chords"
+			]
+		},
+		{
+			"name": "dorian_chords",
+			"method": true,
+			"params": [
+				{
+					"name": "intention",
+					"type": "str"
+				}
+			],
+			"body": [
+				"try:",
+				"  chords = ut.generate_chords(md.dorian, intention)",
+				"except ValueError as e:",
+				"  return e",
+				"return chords"
+			]
+		},
+		{
+			"name": "custom_chords",
+			"method": true,
+			"params": [
+				{
+					"name": "intention",
+					"type": "str"
+				},
+				{
+					"name": "custom_mode",
+					"type": "dict[str, str]"
+				}
+			],
+			"body": [
+				"try:",
+				"  chords = ut.generate_chords(custom_mode, intention)",
+				"except ValueError as e:",
+				"  return e",
+				"return chords"
+			]
+		},
+		{
+			"name": "generate_models_py",
+			"method": true,
+			"params": [
+				{
+					"name": "req",
+					"type": "md.ApiGenRequest"
+				},
+				{
+					"name": "temp_dir",
+					"type": "str"
+				}
+			],
+			"body": [
+				"models_file_path = os.path.join(temp_dir, 'models.py')",
+				"with open(models_file_path, \"w\") as f:",
+				"  f.write('from pydantic import BaseModel\\n')",
+				"  if req.enum_map!=None:",
+				"    f.write('from enum import Enum\\n')",
+				"  if any(imp.models for imp in req.import_map):",
+				"    for imp in req.import_map:",
+				"      if imp.models:",
+				"        ut.write_import(imp, f)",
+				"  f.write('\\n')",
+				"  f.write('# Enums')",
+				"  for enum in req.enum_map:",
+				"    f.write(f'class {enum.name}({enum.type}, Enum):\\n')",
+				"    for key_value in enum.members.items():",
+				"      key, value = key_value",
+				"      f.write(f'  {key} = \"{value}\"\\n')",
+				"  for model in req.model_map:",
+				"    f.write(f'class {model.name}(BaseModel):\\n')",
+				"    for key_value in model.struct.items():",
+				"      key, value = key_value",
+				"      f.write(f'  {key}: {value}\\n')",
+				"    f.write('\\n')"
+			]
+		},
+		{
+			"name": "generate_methods_py",
+			"method": true,
+			"params": [
+				{
+					"name": "req",
+					"type": "md.ApiGenRequest"
+				},
+				{
+					"name": "temp_dir",
+					"type": "str"
+				}
+			],
+			"body": [
+				"methods_file_path = os.path.join(temp_dir, 'methods.py')",
+				"with open(methods_file_path, 'w') as f:",
+				"  if req.model_map!=None:",
+				"    f.write(f'import models as md\\n')",
+				"  if any(func.utils in req.func_map):",
+				"    f.write(f'import utils as ut\\n')",
+				"  for imp in req.import_map:",
+				"    if imp.methods:",
+				"      ut.write_import(imp, f)",
+				"  for func in req.func_map:",
+				"    if func.method:",
+				"      ut.write_function(func, f)"
+			]
+		},
+		{
+			"name": "generate_utils_py",
+			"method": true,
+			"params": [
+				{
+					"name": "req",
+					"type": "md.ApiGenRequest"
+				},
+				{
+					"name": "temp_dir",
+					"type": "str"
+				}
+			],
+			"body": [
+				"utils_file_path = os.path.join(temp_dir, 'utils.py')",
+				"with open(utils_file_path, 'w') as f:",
+				"  f.write('import models as md\\n')",
+				"  for imp in req.import_map:",
+				"    if imp.utils:",
+				"      ut.write_import(imp, f)",
+				"  for func in req.func_map:",
+				"    if func.utils:",
+				"      ut.write_function(func, f)"
+			]
+		},
+		{
+			"name": "generate_main_py",
+			"method": true,
+			"params": [
+				{
+					"name": "req",
+					"type": "md.ApiGenRequest"
+				},
+				{
+					"name": "temp_dir",
+					"type": "str"
+				}
+			],
+			"body": [
+				"main_file_path = os.path.join(temp_dir, 'main.py')",
+				"with open(main_file_path, 'w') as f:",
+				"  f.write('from fastapi import FastAPI, HTTPException\\n')",
+				"  f.write('from fastapi.responses import FileResponse\\n')",
+				"  f.write('from fastapi.middleware.cors import CORSMiddleware\\n')",
+				"  if req.model_map!= None:",
+				"    f.write('import models as md')",
+				"  if any(func.method for func in req.func_map):",
+				"    f.write('import methods as mt')",
+				"  if req.env_map!=None:",
+				"    f.write('from dotenv import load_dotenv')",
+				"    f.write('load_dotenv()\\n\\n')",
+				"  for imp in req.import_map:",
+				"    if imp.main:",
+				"      ut.write_import(imp, f)",
+				"f.write('\\n')",
+				"f.write('app = FastAPI()\\n')",
+				"f.write('app.add_middleware(CORSMiddleware, allow_origins=['*'], allow_credentials=True, allow_methods=['*'], allow_headers=['*'])\\n')",
+				"for func in req.func_map:",
+				"  if func.main:",
+				"    ut.write_function(func, f)",
+				"for route in req.route_map:",
+				"  file_responses = [md.ContentType.mp3, md.ContentType.mp4, md.ContentType.wav, md.ContentType.jpg, md.ContentType.zp, md.ContentType.png, md.ContentType.gif, md.ContentType.jpeg, md.ContentType.py, md.ContentType.js]",
+				"  match route.method:",
+				"    case md.RESTMethod.get:",
+				"      f.write(f'@app.get(\"{route.path}\"')",
+				"    case md.RESTMethod.post:",
+				"      f.write(f'@app.post(\"{route.path}\"')",
+				"    case md.RESTMethod.put:",
+				"      f.write(f'@app.put(\"{route.path}\"')",
+				"    case md.RESTMethod.delete:",
+				"      f.write(f'@app.delete(\"{route.path}\"')",
+				"  if file_responses.__contains__(route.response_type):",
+				"    f.write(', response_class=FileResponse')",
+				"  f.write(')\\n')",
+				"  ut.write_function(route.handler, f)"
+			]
+		},
+		{
+			"name": "generate_env",
+			"method": true,
+			"params": [
+				{
+					"name": "req",
+					"type": "md.ApiGenRequest"
+				},
+				{
+					"name": "temp_dir",
+					"type": "str"
+				}
+			],
+			"body": [
+				"if req.env_map!= None:",
+				"  env_file_path = os.path.join(temp_dir, '.env')",
+				"  with open(env_file_path, 'w') as f:",
+				"    for key, value in req.env_map.items():",
+				"      f.write(f'{key}=\"{value}\"\\n')"
+			]
+		},
+		{
+			"name": "generate_api_code",
+			"method": true,
+			"params": [
+				{
+					"name": "req",
+					"type": "md.ApiGenRequest"
+				},
+				{
+					"name": "temp_dir",
+					"type": "str"
+				}
+			],
+			"body": [
+				"if req.env_map != None:",
+				"  generate_env(req, temp_dir)",
+				"if req.model_map!= None:",
+				"  generate_models_py(req, temp_dir)",
+				"if any(func.method for func in req.func_map):",
+				"  generate_methods_py(req, temp_dir)",
+				"generate_main_py(req, temp_dir)"
+			]
+		},
+		{
+			"name": "generate_chunks",
+			"utils": true,
+			"params": [
+				{
+					"name": "intent",
+					"type": "str"
+				}
+			],
+			"body": [
+				"# define intent string with spaces, punctuation,",
+				"# repeating characters,and capitalization removed",
+				"lower_unique = []",
+				"for char in intent:",
+				"  if char.isalpha() and lower_unique.__contains__(char.lower()) == False:",
+				"    lower_unique.append(char.lower())",
+				"print('lower_unique', lower_unique)",
+				"if len(lower_unique)<=16:",
+				"  return 'error: Intention contains too few unique characters. Please elaborate further.'",
+				"#convert lower-case input to scale degrees using scale_degree_dict",
+				"scale_degrees = []",
+				"for char in lower_unique:",
+				"  scale_degrees.append(md.scale_degree_dict[char])",
+				"print('scale_degrees', scale_degrees)",
+				"",
+				"# split scale degrees into four data chunks to be used as",
+				"# chord generation vectors",
+				"chunks = []",
+				"for i in range(0, 16, 4):",
+				"  chunks.append(scale_degrees[i:i+4])",
+				"print('chunks', chunks)",
+				"return chunks"
+			]
+		},
+		{
+			"name": "validate_chunks",
+			"params": [
+				{
+					"name": "chunks",
+					"type": "list[list[int]]"
+				}
+			],
+			"utils": true,
+			"body": [
+				"if len(chunks)!=4:",
+				"  return ValueError('not enough data chunks')",
+				"",
+				"for chunk in chunks:",
+				"  for i in range(4):",
+				"    if not 1<=int(chunk[i])<=7:",
+				"      return ValueError(f'{int(chunk[i])} is not in range 1-7')",
+				"return chunks"
+			]
+		},
+		{
+			"name": "generate_chords",
+			"params": [
+				{
+					"name": "mode",
+					"type": "List[int]"
+				},
+				{
+					"name": "intent",
+					"type": "str"
+				}
+			],
+			"utils": true,
+			"body": [
+				"print('mode', mode)",
+				"chunks = generate_chunks(intent)",
+				"print(chunks)",
+				"try:",
+				"  chunks = validate_chunks(chunks)",
+				"except ValueError as e:",
+				"  return e",
+				"# Create contrary motion by alternating max and min values",
+				"# Subtract 1 from each to give valid array indices",
+				"scale_degrees = [",
+				"  max(chunks[0])-1,",
+				"  min(chunks[1])-1,",
+				"  max(chunks[2])-1,",
+				"  min(chunks[3])-1",
+				"]",
+				"print('scale_degrees', scale_degrees)",
+				"# apply the chosen mode dictionary to the raw scale degrees",
+				"chord_names = []",
+				"for i in range(len(scale_degrees)):",
+				"  chord_names.append(mode[scale_degrees[i]])",
+				"print('chord_names', chord_names)",
+				"return chord_names"
+			]
+		},
+		{
+			"name": "write_function",
+			"params": [
+				{
+					"name": "func",
+					"type": "md.Func"
+				},
+				{
+					"name": "f",
+					"type": "TextIOWrapper"
+				}
+			],
+			"utils": true,
+			"body": [
+				"param_declarations = []",
+				"if func.params!= None:",
+				"    for param in func.params:",
+				"        declaration = f\"{param.name}: {param.type}\"",
+				"        param_declarations.append(declaration)",
+				"if len(param_declarations)>0:",
+				"    declaration_str = \", \".join(param_declarations).rstrip(\", \")",
+				"    f.write(f\"def {func.name}({declaration_str})\")",
+				"else:",
+				"    f.write(f\"def {func.name}()\")",
+				"if func.return_type!= None:",
+				"    f.write(f\" -> {func.return_type}\")",
+				"f.write(\":\\n\")",
+				"for line in func.body:",
+				"    f.write(f\"  {line}\\n\")",
+				"f.write(\"\\n\\n\")"
+			]
+		},
+		{
+			"name": "write_import",
+			"params": [
+				{
+					"name": "imp",
+					"type": "md.Import"
+				},
+				{
+					"name": "f",
+					"type": "TextIOWrapper"
+				}
+			],
+			"utils": true,
+			"body": [
+				"if imp.alias != None:",
+				"    f.write(f\"import {imp.name} as {imp.alias}\\n\")",
+				"elif imp.members != None:",
+				"    members_str = \", \".join(member for member in imp.members)",
+				"    f.write(f\"from {imp.name} import {members_str}\".rstrip(\", \"))",
+				"    f.write(\"\\n\")",
+				"else:",
+				"    f.write(f\"import {imp.name}\\n\")"
+			]
+		}
+	],
+	"model_map": [
+		{
+			"name": "Import",
+			"struct": {
+				"name": "str",
+				"main": "bool = False",
+				"methods": "bool = False",
+				"utils": "bool = False",
+				"alias": "str|None = None",
+				"members": "List[str]|None = None"
+			}
+		},
+		{
+			"name": "Model",
+			"struct": {
+				"name": "str",
+				"struct": "dict"
+			}
+		},
+		{
+			"name": "MyEnum",
+			"struct": {
+				"name": "str",
+				"type": "str",
+				"members": "dict"
+			}
+		},
+		{
+			"name": "Param",
+			"struct": {
+				"name": "str",
+				"type": "str|None = None"
+			}
+		},
+		{
+			"name": "Func",
+			"struct": {
+				"name": "str",
+				"params": "List[Param]|None = None",
+				"return_type": "str|None = None",
+				"body": "List[str]",
+				"main": "bool = False",
+				"util": "bool = False",
+				"handler": "bool = False",
+				"method": "bool = True"
+			}
+		},
+		{
+			"name": "Route",
+			"struct": {
+				"path": "str",
+				"method": "RESTMethod",
+				"req_model": "Model|MyEnum|None = None",
+				"req_body_type": "ContentType|None = None",
+				"handler": "Func",
+				"res_model": "Model|MyEnum|None = None",
+				"res_body_type": "ContentType = ContentType.json"
+			}
+		},
+		{
+			"name": "ModeRequest",
+			"struct": {
+				"intention": "str"
+			}
+		},
+		{
+			"name": "CustomModeRequest",
+			"struct": {
+				"intention": "str",
+				"mode": "List[str]"
+			}
+		},
+		{
+			"name": "ApiGenRequest",
+			"struct": {
+				"env_map": "dict|None = None",
+				"import_map": "List[Import]|None = None",
+				"func_map": "List[Func]",
+				"model_map": "List[Model]|None = None",
+				"enum_map": "List[MyEnum]|None = None",
+				"route_map": "List[Route]"
+			}
+		}
+	],
+	"enum_map": [
+		{
+			"name": "Mode",
+			"type": "str",
+			"members": {
+				"major": "major",
+				"minor": "minor",
+				"dorian": "dorian",
+				"mixolydian": "mixolydian"
+			}
+		},
+		{
+			"name": "RESTMethod",
+			"type": "str",
+			"members": {
+				"get": "get",
+				"post": "post",
+				"put": "put",
+				"delete": "delete"
+			}
+		},
+		{
+			"name": "ContentType",
+			"type": "str",
+			"members": {
+				"json": "application/json",
+				"txt": "text/plain",
+				"html": "text/html",
+				"png": "image/png",
+				"jpg": "image/jpeg",
+				"gif": "image/gif",
+				"mp3": "audio/mpeg",
+				"wav": "audio/wav",
+				"mp4": "video/mp4",
+				"py": "text/x-python",
+				"js": "application/javascript",
+				"multipart": "multipart/form-data",
+				"zp": "application/zip"
+			}
+		}
+	],
+	"dict_map": [
+		{
+			"name": "scale_degree_dict",
+			"value": {
+				"a": 1,
+				"b": 2,
+				"c": 3,
+				"d": 4,
+				"e": 5,
+				"f": 6,
+				"g": 7,
+				"h": 1,
+				"i": 2,
+				"j": 3,
+				"k": 4,
+				"l": 5,
+				"m": 6,
+				"n": 7,
+				"o": 1,
+				"p": 2,
+				"q": 3,
+				"r": 4,
+				"s": 5,
+				"t": 6,
+				"u": 7,
+				"v": 1,
+				"w": 2,
+				"x": 3,
+				"y": 4,
+				"z": 5
+			}
+		},
+		{
+			"name": "major",
+			"value": {
+				"0": "C",
+				"1": "Dm",
+				"2": "Em",
+				"3": "F",
+				"4": "G",
+				"5": "Am",
+				"6": "Bdim7"
+			}
+		},
+		{
+			"name": "minor",
+			"value": {
+				"0": "Am",
+				"1": "Bdim7",
+				"2": "C",
+				"3": "Dm",
+				"4": "E(m)",
+				"5": "F",
+				"6": "G"
+			}
+		},
+		{
+			"name": "dorian",
+			"value": {
+				"0": "Dm",
+				"1": "Em",
+				"2": "F",
+				"3": "G",
+				"4": "Am",
+				"5": "Bdim7",
+				"6": "C"
+			}
+		},
+		{
+			"name": "mixolydian",
+			"value": {
+				"0": "G",
+				"1": "Am",
+				"2": "Bdim7",
+				"3": "C",
+				"4": "Dm",
+				"5": "Em",
+				"6": "F"
+			}
+		}
+	],
+	"ref_map": [
+		{
+			"name": "file_responses",
+			"ref": "ContentType",
+			"list": true,
+			"members": [
+				"ContentType.mp3",
+				"ContentType.mp4",
+				"ContentType.wav",
+				"ContentType.jpg",
+				"ContentType..zp",
+				"ContentType.png",
+				"ContentType.gif",
+				"ContentType.py",
+				"ContentType.js"
+			]
+		}
+	],
+	"route_map": [
+		{
+			"path": "/api-gen/{title}",
+			"method": "post",
+			"req_model": "ApiGenRequest",
+			"handler":  {
+				"name": "api_gen",
+				"handler": true,
+				"params": [
+					{
+						"name": "req",
+						"type": "md.ApiGenRequest"
+					},
+					{
+						"name": "title"
+					}
+				],
+				"body": [
+					"with TemporaryDirectory() as temp_dir:",
+					"  mt.generate_api_code(req, title, temp_dir)",
+					"  zip_path = shutil.make_archive(title, 'zip', temp_dir)",
+					"return FileResponse(zip_path, media_type='application/zip', filename=f'{title}.zip')"
+				]
+			}
+		},
+		{
+			"path": "/chordgen/custom-mode",
+			"method": "post",
+			"req_model": "CustomModeRequest",
+			"handler": {
+				"name": "custom_chordgen",
+				"handler": true,
+				"params": [
+					{
+						"name": "req",
+						"type": "md.CustomModeRequest"
+					}
+				],
+				"body": [
+					"if len(req.mode) != 7:",
+					"  return {\"error\": \"Invalid number of scale degrees\"}, 400",
+					"",
+					"return mt.custom_chords(req.intention, req.mode)"
+				]
+			}
+		},
+		{
+			"path": "/chordgen/modes/{mode}",
+			"method": "post",
+			"req_model": "ModeRequest",
+			"handler": {
+				"name": "mode_chordgen",
+				"handler": true,
+				"params": [
+					{
+						"name": "req",
+						"type": "md.ModeRequest"
+					},
+					{
+						"name": "mode"
+					}
+				],
+				"body": [
+					"match mode:",
+					"  case md.Mode.major:",
+					"    return mt.major_chords(req.intention)",
+					"  case md.Mode.minor:",
+					"    return mt.minor_chords(req.intention)",
+					"  case md.Mode.dorian:",
+					"    return mt.dorian_chords(req.intention)",
+					"  case md.Mode.mixolydian:",
+					"    return mt.mixo_chords(req.intention)",
+					"  case _:",
+					"    raise HTTPException(status_code=400, detail=\"Invalid mode parameter\")"
+				]
+			}
+		},
+		{
+			"path": "/pie-chart/{title}",
+			"method": "post",
+			"req_model": "dict",
+			"handler": {
+				"name": "pie_chart",
+				"handler": true,
+				"params": [
+					{
+						"name": "data",
+						"type": "dict"
+					},
+					{
+						"name": "title"
+					}
+				],
+				"body": [
+					"if sum(data.values()) != 100:",
+					"  raise HTTPException(status_code=400, detail=\"Data values must sum to 100\")",
+					"buffer = build_pie_chart(data)",
+					"# Save the buffer to a temporary file",
+					"with NamedTemporaryFile(delete=False) as f:",
+					"  f.write(buffer.getvalue())",
+					"  f.flush()",
+					"  # Return the file as a FileResponse",
+					"  headers = {\"Content-Disposition\": f\"inline; filename={title}.png\"}",
+					"  return FileResponse(f.name, media_type='image/png', filename=f'{title}.png', headers=headers)"
+				]
+			}
+		}
+	]
+}
