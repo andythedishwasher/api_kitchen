@@ -18,7 +18,7 @@ I'll be working on a few different front end clients for interfacing with it, bu
 
 Fun.
 
-## How it does:
+## How it works:
 
 This tool takes advantage of a few very useful facts about Python.
 
