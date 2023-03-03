@@ -12,8 +12,7 @@ This will also help you if you haven't approached writing a backend before, but 
 ## What it's for:
 
 Right now, this is only a backend that can accept a JSON specification (like the one in spec.json which describes this API and can be used for testing your local instance).
-The next step will be a series of front end clients for interacting with this API so that its full utility can be unlocked.
-The initial experiments will be hosted at www.thecodekitchen.xyz/api-kitchen once they are developed to a deployable state.
+I'll be working on a few different front end clients for interfacing with it, but I'm publishing this backend repo as an open-source contribution.
 
 ## Why it's for:
 
