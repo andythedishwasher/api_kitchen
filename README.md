@@ -45,6 +45,7 @@ Right now, as stated above, this is only a backend. I'm waiting to host it mysel
 uvicorn main:app --reload
 ```
 This will run a live development server with hot reload from localhost.
+
 4. navigate to http://localhost:8000/docs to view the auto-generated documentation for your brand new REST API generator!
 5. Copy the entire contents of spec.json and click the 'Try It Out' button in the Swagger UI. That will allow you to paste the json into the request body section. Don't forget to name your new copy! In production, this will be YOUR codebase you get to download.
 6. Click Execute, scroll down past the (admittedly very large) request body, and click the Download File link in the response.
