@@ -24,7 +24,7 @@ This tool takes advantage of a few very useful facts about Python.
 
 1. There's not very much punctuation. A lot of the logic flow is done with indentation, which is really easy to generate with spaces.
 2. There are libraries for EVERYTHING, and ChatGPT will gladly tell you all about most of them, including how you should use them to accomplish your goals.
-3. It has fastapi. Fastapi is an incredibly light-weight, self-documenting API framework that I could geek out about for much further than most attention spans span. Here's the highlights:
+3. It has [FastAPI](https://github.com/tiangolo/fastapi). FastAPI is an incredibly light-weight, self-documenting API framework that I could geek out about for much further than most attention spans span. Here's the highlights:
   - creates Swagger and Redoc documentation servers with ZERO CONFIG. It just reads your routes and documents them.
   - seamless integration with pydantic, a library for creating request and response models as well as any nested models within them. This makes request validation very quick and easy.
   - built-in uvicorn server reduces deployment to a few CLI commands
